@@ -31,6 +31,8 @@ DELTA := /usr/bin/delta
 NAVI := $(HOME_BIN_DIR)/navi
 FZF_DIR := $(HOME)/.fzf
 STARSHIP := $(HOME_BIN_DIR)/starship
+NODE := /usr/local/bin/node
+YARN := /usr/bin/yarn
 BASH_GIT_PROMPT_DIR := $(HOME)/.bash-git-prompt
 BASH_COMPLETION_PATH := $(HOME)/.git-completion.bash
 
@@ -44,6 +46,8 @@ install: \
 	delta \
 	navi \
 	starship \
+	node \
+	yarn \
 	completion
 
 .PHONY: apt
@@ -101,6 +105,21 @@ completion: $(BASH_COMPLETION_PATH)
 $(BASH_COMPLETION_PATH):
 	${CURL} https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o $@
 
+.PHONY: node
+node: $(NODE)
+$(NODE):
+	sudo apt-get -y --no-install-recommends install npm
+	sudo npm i -g n
+	sudo n $(NODE_VERSION)
+
+.PHONY: yarn
+yarn: $(YARN)
+$(YARN): $(NODE)
+	curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+	echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+	sudo apt update
+	sudo apt install -y --no-install-recommends yarn
+
 .PHONY: clean
 clean:
 	sudo apt-get purge -y $(PACKAGES) gh
@@ -110,3 +129,4 @@ clean:
 	rm -rf $(FZF_DIR)
 	rm -f $(STARSHIP)
 	rm -f $(BASH_COMPLETION_PATH)
+	sudo rm -rf $(NODE)

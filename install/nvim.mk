@@ -11,15 +11,11 @@ PYENV_VIRTUALENV_DIR=$(PYENV_DIR)/plugins/pyenv-virtualenv
 NVIM2_DIR := $(PYENV_DIR)/versions/neovim2
 NVIM3_DIR := $(PYENV_DIR)/versions/neovim3
 
-NODE := /usr/local/bin/node
-YARN := /usr/bin/yarn
-
 .PHONY: nvim-install
 nvim-install: \
 	nvim \
 	neovim2 \
-	neovim3 \
-	node
+	neovim3
 
 .PHONY: nvim
 nvim: $(NVIM)
@@ -42,6 +38,7 @@ $(NVIM2_DIR): $(PYENV_VIRTUALENV_DIR) $(PYTHON2_DIR)
 	$(PYENV) virtualenv $(PYTHON2_VERSION) neovim2
 	CURRENT=$($(PYENV) global) && \
 			$(PYENV) global neovim2 && \
+			$(NVIM2_DIR)/bin/pip install -U pip && \
 			$(NVIM2_DIR)/bin/pip install pynvim && \
 			$(PYENV) global $${CURRENT}
 
@@ -51,23 +48,10 @@ $(NVIM3_DIR): $(PYENV_VIRTUALENV_DIR) $(PYTHON3_DIR)
 	$(PYENV) virtualenv $(PYTHON3_VERSION) neovim3
 	CURRENT=$($(PYENV) global) && \
 			$(PYENV) global neovim3 && \
+			$(NVIM3_DIR)/bin/pip install -U pip && \
 			$(NVIM3_DIR)/bin/pip install pynvim && \
+			$(NVIM3_DIR)/bin/pip install keyring browser-cookie3 && \
 			$(PYENV) global $${CURRENT}
-
-.PHONY: node
-node: $(NODE)
-$(NODE):
-	sudo apt-get update
-	sudo apt-get -y --no-install-recommends install npm
-	sudo npm i -g n
-	sudo n $(NODE_VERSION)
-
-.PHONY: yarn
-yarn: $(YARN)
-	curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-	echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-	sudo apt update
-	sudo apt install -y --no-install-recommends yarn
 
 .PHONY: nvim-clean
 nvim-clean:
@@ -75,5 +59,4 @@ nvim-clean:
 	rm -rf $(PYENV_VIRTUALENV_DIR)
 	rm -rf $(NVIM2_DIR)
 	rm -rf $(NVIM3_DIR)
-	sudo rm -rf $(NODE)
 

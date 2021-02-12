@@ -131,6 +131,8 @@ if has('nvim')
     Plug 'tmux-plugins/vim-tmux-focus-events' " tmux clipboard
     Plug 'roxma/vim-tmux-clipboard' " tmux clipboard
     Plug 'cocopon/vaffle.vim'
+    Plug 'ianding1/leetcode.vim'
+    let g:leetcode_browser = 'firefox'
 
     " ranger
     Plug 'francoiscabrol/ranger.vim'
